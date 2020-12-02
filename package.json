@@ -1,0 +1,26 @@
+{
+  "name": "chatter",
+  "version": "1.0.0",
+  "description": "make chat walkthrough",
+  "main": "app.js",
+  "scripts": {
+    "dev": "nodemon",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/aucoeur/chatter.git"
+  },
+  "author": "Aucoeur Ngo",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/aucoeur/chatter/issues"
+  },
+  "homepage": "https://github.com/aucoeur/chatter#readme",
+  "dependencies": {
+    "express": "^4.17.1",
+    "express-handlebars": "^5.2.0",
+    "mongoose": "^5.11.1",
+    "socket.io": "^3.0.3"
+  }
+}
