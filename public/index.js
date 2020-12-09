@@ -7,8 +7,17 @@ function onReady() {
     // Get the online users from the server
     socket.emit('get online users');
 
+    // Default channel
+    socket.emit('user changed channel', "General");
+
+    document.addEventListener('click', (e) => {
+        let channel = e.target.classList.contains('channel')
+        socket.emit('user changed channel', channel)
+    });
+
     document.getElementById('create-user-btn').addEventListener('click', (e) => {
         e.preventDefault();
+
         let username = document.getElementById('username-input').value;
         if (username.length > 0) {
             currentUser = username;
@@ -23,11 +32,14 @@ function onReady() {
 
     document.getElementById('send-chat-btn').addEventListener('click', (e) => {
         e.preventDefault();
+
+        let channel = document.querySelector('.channel-current').innerText;
         let message = document.getElementById('chat-input').value;
         if (message.length > 0) {
             socket.emit('new message', {
                 sender: currentUser,
-                message: message
+                message: message,
+                channel: channel,
             });
             document.getElementById('chat-input').value = "";
         }
@@ -75,8 +87,11 @@ function onReady() {
     }
 
     socket.on('new message', (data) => {
-        createMessage(data)
+        let currentChannel = document.querySelector('.channel-current').innerText;
 
+        if (currentChannel == data.channel) {
+            createMessage(data)
+        };
     });
 
     // Helper function because D R Y
@@ -108,7 +123,7 @@ function onReady() {
     socket.on('new channel', (newChannel) => {
         let channel = document.createElement('div');
         channel.classList.add('channel');
-        channel.textContent = newChannel;
+        channel.innerText = newChannel;
 
         const channels = document.querySelector('.channels');
         channels.appendChild(channel);
@@ -116,18 +131,24 @@ function onReady() {
 
     socket.on('user changed channel', (data) => {
         const currChannel = document.querySelector('.channel-current');
-        currChannel.classList.add('channel');
-        currChannel.classList.remove('channel-current');
+        // currChannel.className = "channel"
+        // if (currChannel) {
+        //     currChannel.classList.add('channel');
+        //     currChannel.classList.remove('channel-current');
+        // }
 
-        const channel = document.querySelector(`.channel`)
-        if (channel.classList.contains(`${data.channel}`)) {
-            channel.classList.add('channel-current');
-            channel.classList.remove('channel');
+        const selectedChannel = document.querySelectorAll(`.channel`)
+        if (selectedChannel.innerText == data.channel) {
+            selectedChannel.classList.add('channel-current');
+            selectedChannel.classList.remove('channel');
+            // selectedChannel.className = 'channel-current';
 
             let message = document.querySelector('.message');
-            while (message.firstChild) {
-                message.removeChild(message.firstChild)
-            };
+            if (message) {
+                while (message.firstChild) {
+                    message.removeChild(message.firstChild)
+                };
+            }
             for (msg in data.messages) {
                 createMessage(msg)
             }
