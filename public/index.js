@@ -4,6 +4,8 @@ function onReady() {
     const socket = io.connect();
 
     let currentUser;
+    // Get the online users from the server
+    socket.emit('get online users');
 
     document.getElementById('create-user-btn').addEventListener('click', (e) => {
         e.preventDefault();
@@ -43,12 +45,12 @@ function onReady() {
     });
 
     socket.on('new message', (data) => {
-        const message =  document.createElement("div")
+        const message = document.createElement("div")
         message.classList.add('message')
 
         const msgUser = document.createElement("p");
         msgUser.classList.add('message-user');
-        msgUser.textContent = `${data.sender}`;
+        msgUser.textContent = `${data.sender}: `;
 
         const msgText = document.createElement("p");
         msgText.classList.add('message-text');
@@ -60,5 +62,39 @@ function onReady() {
         let box = document.querySelector('.message-container')
         box.appendChild(message);
 
-    })
+    });
+
+    socket.on('get online users', (onlineUsers) => {
+        // for (username in onlineUsers) {
+        //     let user = document.createElement("div")
+        //     user.classList.add('user-online');
+        //     user.textContent = `${username}`;
+
+        //     const onlineUsers = document.querySelector('.users-online')
+        //     onlineUsers.appendChild(user);
+        // }
+        getOnlineUsers(onlineUsers);
+    });
+
+    socket.on('user has left', (onlineUsers) => {
+        let userList = document.querySelector('.users-online');
+        while (userList.firstChild) {
+            userList.removeChild(userList.firstChild)
+        };
+        // for (username in onlineUsers) {
+        // }
+        getOnlineUsers(onlineUsers);
+
+    });
+
+    function getOnlineUsers(onlineUsers) {
+        for (username in onlineUsers) {
+            let user = document.createElement("div")
+            user.classList.add('user-online');
+            user.textContent = `${username}`;
+
+            const onlineUsers = document.querySelector('.users-online')
+            onlineUsers.appendChild(user);
+        }
+    }
 }
