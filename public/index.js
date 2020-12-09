@@ -11,8 +11,11 @@ function onReady() {
     socket.emit('user changed channel', "General");
 
     document.addEventListener('click', (e) => {
-        let channel = e.target.classList.contains('channel')
-        socket.emit('user changed channel', channel)
+        if ((!e.target.classList.contains('channel-current')) && (e.target.classList.contains('channel'))) {
+            let channel = e.target.innerText;
+            console.log(channel);
+            socket.emit('user changed channel', channel);
+        }
     });
 
     document.getElementById('create-user-btn').addEventListener('click', (e) => {
@@ -151,7 +154,7 @@ function onReady() {
             }
             for (msg in data.messages) {
                 createMessage(msg)
-            }
+            };
 
         }
     })
