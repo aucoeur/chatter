@@ -33,6 +33,16 @@ function onReady() {
         }
     });
 
+    document.getElementById('new-channel-btn').addEventListener('click', (e) => {
+        e.preventDefault();
+        let newChannel = document.getElementById('new-channel-input').value;
+        if (newChannel.length > 0) {
+            // Emit the new channel to the server
+            socket.emit('new channel', newChannel);
+            document.getElementById('chat-input').value = "";
+        };
+    });
+
     // socket listeners
     socket.on('new user', (username) => {
         console.log(`${username} has joined the chat! ✋`);
