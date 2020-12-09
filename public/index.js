@@ -54,7 +54,8 @@ function onReady() {
         onlineUsers.appendChild(user);
     });
 
-    socket.on('new message', (data) => {
+    // Helper function new message
+    function createMessage(data) {
         const message = document.createElement("div")
         message.classList.add('message')
 
@@ -71,32 +72,14 @@ function onReady() {
 
         let box = document.querySelector('.message-container')
         box.appendChild(message);
+    }
+
+    socket.on('new message', (data) => {
+        createMessage(data)
 
     });
 
-    socket.on('get online users', (onlineUsers) => {
-        // for (username in onlineUsers) {
-        //     let user = document.createElement("div")
-        //     user.classList.add('user-online');
-        //     user.textContent = `${username}`;
-
-        //     const onlineUsers = document.querySelector('.users-online')
-        //     onlineUsers.appendChild(user);
-        // }
-        getOnlineUsers(onlineUsers);
-    });
-
-    socket.on('user has left', (onlineUsers) => {
-        let userList = document.querySelector('.users-online');
-        while (userList.firstChild) {
-            userList.removeChild(userList.firstChild)
-        };
-        // for (username in onlineUsers) {
-        // }
-        getOnlineUsers(onlineUsers);
-
-    });
-
+    // Helper function because D R Y
     function getOnlineUsers(onlineUsers) {
         for (username in onlineUsers) {
             let user = document.createElement("div")
@@ -106,5 +89,49 @@ function onReady() {
             const onlineUsers = document.querySelector('.users-online')
             onlineUsers.appendChild(user);
         }
-    }
+    };
+
+    socket.on('get online users', (onlineUsers) => {
+        getOnlineUsers(onlineUsers);
+    });
+
+    socket.on('user has left', (onlineUsers) => {
+        let userList = document.querySelector('.users-online');
+        while (userList.firstChild) {
+            userList.removeChild(userList.firstChild)
+        };
+
+        getOnlineUsers(onlineUsers);
+
+    });
+
+    socket.on('new channel', (newChannel) => {
+        let channel = document.createElement('div');
+        channel.classList.add('channel');
+        channel.textContent = newChannel;
+
+        const channels = document.querySelector('.channels');
+        channels.appendChild(channel);
+    })
+
+    socket.on('user changed channel', (data) => {
+        const currChannel = document.querySelector('.channel-current');
+        currChannel.classList.add('channel');
+        currChannel.classList.remove('channel-current');
+
+        const channel = document.querySelector(`.channel`)
+        if (channel.classList.contains(`${data.channel}`)) {
+            channel.classList.add('channel-current');
+            channel.classList.remove('channel');
+
+            let message = document.querySelector('.message');
+            while (message.firstChild) {
+                message.removeChild(message.firstChild)
+            };
+            for (msg in data.messages) {
+                createMessage(msg)
+            }
+
+        }
+    })
 }
