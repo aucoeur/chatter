@@ -151,10 +151,10 @@ function onReady() {
             //         message.removeChild(message.firstChild)
             //     };
             // }
-            for (msg in data.messages) {
+            console.log(data.messages)
+            data.messages.forEach(msg => {
                 createMessage(msg)
-            };
-
+            });
         }
     })
 }
