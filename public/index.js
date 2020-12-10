@@ -10,13 +10,15 @@ function onReady() {
     // Default channel
     socket.emit('user changed channel', "General");
 
-    document.addEventListener('click', (e) => {
-        if ((!e.target.classList.contains('channel-current')) && (e.target.classList.contains('channel'))) {
-            let channel = e.target.innerText;
-            console.log(channel);
-            socket.emit('user changed channel', channel);
-        }
+    document.querySelector('.channels').addEventListener('click', (e) => {
+        if (e.target.className === 'channel') {
+            let channelId = e.target.id;
+            console.log(channelId);
+            socket.emit('user changed channel', channelId);
+        };
     });
+
+
 
     document.getElementById('create-user-btn').addEventListener('click', (e) => {
         e.preventDefault();
@@ -126,32 +128,29 @@ function onReady() {
     socket.on('new channel', (newChannel) => {
         let channel = document.createElement('div');
         channel.classList.add('channel');
+        channel.setAttribute('id', newChannel)
         channel.innerText = newChannel;
 
         const channels = document.querySelector('.channels');
         channels.appendChild(channel);
     })
 
+
     socket.on('user changed channel', (data) => {
         const currChannel = document.querySelector('.channel-current');
-        // currChannel.className = "channel"
-        // if (currChannel) {
-        //     currChannel.classList.add('channel');
-        //     currChannel.classList.remove('channel-current');
-        // }
 
-        const selectedChannel = document.querySelectorAll(`.channel`)
-        if (selectedChannel.innerText == data.channel) {
-            selectedChannel.classList.add('channel-current');
-            selectedChannel.classList.remove('channel');
-            // selectedChannel.className = 'channel-current';
+        if (!(currChannel.id == data.channel)) {
+            currChannel.className = 'channel';
+            let selectedChannel = document.getElementById(`${data.channel}`);
+            selectedChannel.className = 'channel-current';
 
-            let message = document.querySelector('.message');
-            if (message) {
-                while (message.firstChild) {
-                    message.removeChild(message.firstChild)
-                };
-            }
+            let messageBox = document.querySelector('.message-container');
+            messageBox.innerHTML = "";
+            // if (message) {
+            //     while (message.firstChild) {
+            //         message.removeChild(message.firstChild)
+            //     };
+            // }
             for (msg in data.messages) {
                 createMessage(msg)
             };
