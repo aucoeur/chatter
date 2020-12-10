@@ -4,8 +4,10 @@ function onReady() {
     const socket = io.connect();
 
     let currentUser;
-    // Get the online users from the server
+
+    // Get the online users and channels from the server
     socket.emit('get online users');
+    socket.emit('get channels');
 
     // Default channel
     socket.emit('user changed channel', "General");
@@ -17,8 +19,6 @@ function onReady() {
             socket.emit('user changed channel', channelId);
         };
     });
-
-
 
     document.getElementById('create-user-btn').addEventListener('click', (e) => {
         e.preventDefault();
@@ -123,6 +123,24 @@ function onReady() {
 
         getOnlineUsers(onlineUsers);
 
+    });
+
+    function getChannels(channels) {
+        for (channel in channels) {
+            if (!(channel == 'General')) {
+                let newChannel = document.createElement('div');
+                    newChannel.classList.add('channel');
+                    newChannel.setAttribute('id', channel)
+                    newChannel.innerText = channel;
+
+                    const channels = document.querySelector('.channels');
+                    channels.appendChild(newChannel);
+                };
+            }
+    };
+
+    socket.on('get channels', (channels) => {
+        getChannels(channels);
     });
 
     socket.on('new channel', (newChannel) => {
